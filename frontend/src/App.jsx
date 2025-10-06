@@ -16,7 +16,7 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <header className="bg-blue-900 text-white p-4 shadow-lg">
           <div className="container mx-auto">
-            <h1 className="text-2xl font-bold">Câmara Municipal de Coronel Barros/RS</h1>
+            <h1 className="text-2xl font-bold">Câmara Municipal de Município Exemplo</h1>
             <p className="text-blue-200">Sistema de Prestação de Contas de Diárias</p>
           </div>
         </header>

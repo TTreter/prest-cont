@@ -1,6 +1,6 @@
-# Aplicação de Prestação de Contas - Câmara Municipal de Coronel Barros/RS
+# Aplicação de Prestação de Contas - Câmara Municipal de Município Exemplo
 
-Esta é uma aplicação web local desenvolvida para auxiliar na prestação de contas de diárias para servidores públicos da Câmara Municipal de Coronel Barros/RS.
+Esta é uma aplicação web local desenvolvida para auxiliar na prestação de contas de diárias para servidores públicos da Câmara Municipal de Município Exemplo.
 
 ## Funcionalidades
 

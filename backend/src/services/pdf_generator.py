@@ -132,7 +132,7 @@ class PDFGenerator:
         story.append(Spacer(1, 30))
         
         # Local e data
-        story.append(Paragraph(f"Coronel Barros, {datetime.now().strftime('%d/%m/%Y')}", 
+        story.append(Paragraph(f"Município Exemplo, {datetime.now().strftime('%d/%m/%Y')}", 
                              self.styles['Assinatura']))
         story.append(Spacer(1, 30))
         
@@ -155,7 +155,7 @@ class PDFGenerator:
         story.append(Paragraph("Etiane Acosta Alves", self.styles['Assinatura']))
         story.append(Paragraph("Contadora", self.styles['Assinatura']))
         story.append(Spacer(1, 10))
-        story.append(Paragraph(f"Coronel Barros, {datetime.now().strftime('%d/%m/%Y')}", 
+        story.append(Paragraph(f"Município Exemplo, {datetime.now().strftime('%d/%m/%Y')}", 
                              self.styles['Assinatura']))
         story.append(Spacer(1, 30))
         
@@ -189,7 +189,7 @@ class PDFGenerator:
         story.append(Paragraph(f"{prestacao_data['presidente']['nome']}", self.styles['Assinatura']))
         story.append(Paragraph("Presidente da Câmara de Vereadores", self.styles['Assinatura']))
         story.append(Spacer(1, 10))
-        story.append(Paragraph(f"Coronel Barros, {datetime.now().strftime('%d/%m/%Y')}", 
+        story.append(Paragraph(f"Município Exemplo, {datetime.now().strftime('%d/%m/%Y')}", 
                              self.styles['Assinatura']))
         
         doc.build(story)
@@ -269,7 +269,7 @@ class PDFGenerator:
         story.append(Spacer(1, 50))
         
         # Local e data
-        story.append(Paragraph(f"Coronel Barros, {datetime.now().strftime('%d/%m/%Y')}", 
+        story.append(Paragraph(f"Município Exemplo, {datetime.now().strftime('%d/%m/%Y')}", 
                              self.styles['Assinatura']))
         story.append(Spacer(1, 50))
         
@@ -290,7 +290,7 @@ class PDFGenerator:
         story = []
         
         # Cabeçalho
-        story.append(Paragraph("PREFEITURA MUNICIPAL DE CORONEL BARROS", self.styles['TituloPrincipal']))
+        story.append(Paragraph("PREFEITURA MUNICIPAL DE MUNICÍPIO EXEMPLO", self.styles['TituloPrincipal']))
         story.append(Paragraph("SECRETARIA MUNICIPAL DE ADMINISTRAÇÃO, PLANEJAMENTO E FINANÇAS", 
                              self.styles['Subtitulo']))
         story.append(Spacer(1, 30))
