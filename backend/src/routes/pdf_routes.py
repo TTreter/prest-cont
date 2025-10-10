@@ -8,37 +8,39 @@ from src.models.prestacao_contas import (
 from src.services.pdf_generator import PDFGenerator
 from datetime import datetime
 
+# Define o Blueprint para as rotas relacionadas à geração de PDF.
 pdf_bp = Blueprint("pdf", __name__)
 
+# Rota para gerar PDFs de prestação de contas (diária, passagem ou parecer).
 @pdf_bp.route("/prestacoes/<int:prestacao_id>/pdf/<string:tipo>", methods=["GET"])
 def gerar_pdf(prestacao_id, tipo):
     try:
-        # Buscar dados da prestação, incluindo servidor e presidente
+        # Busca os dados da prestação de contas, incluindo informações do servidor e presidente.
         prestacao = PrestacaoContas.query.options(db.joinedload(PrestacaoContas.servidor), db.joinedload(PrestacaoContas.presidente)).get_or_404(prestacao_id)
         
-        # Buscar adiantamentos
+        # Busca os adiantamentos associados à prestação de contas.
         adiantamentos = Adiantamento.query.filter_by(prestacao_id=prestacao_id).all()
         adiantamento_diaria = next((a for a in adiantamentos if a.tipo == "diaria"), None)
         adiantamento_passagem = next((a for a in adiantamentos if a.tipo == "passagem"), None)
         
-        # Buscar despesas de diárias
+        # Busca as despesas de diárias.
         despesa_diaria = DespesaDiaria.query.filter_by(prestacao_id=prestacao_id).first()
         
-        # Buscar documentos
+        # Busca os documentos de comprovação.
         documentos = DocumentoComprovacao.query.filter_by(prestacao_id=prestacao_id).all()
         
-        # Buscar passagens
+        # Busca as despesas de passagens.
         passagens = DespesaPassagem.query.filter_by(prestacao_id=prestacao_id).all()
         
-        # Buscar cargo para calcular valores
+        # Busca o cargo do servidor para cálculos de valores.
         cargo = None
         if prestacao.servidor and prestacao.servidor.cargo:
             cargo = Cargo.query.filter_by(nome_cargo=prestacao.servidor.cargo).first()
         
-        # Calcular totais
+        # Calcula os totais da prestação de contas.
         totais = calcular_totais_prestacao(prestacao_id, cargo, despesa_diaria, adiantamento_diaria)
         
-        # Preparar dados para o PDF, tratando casos de None
+        # Prepara os dados para a geração do PDF, tratando casos onde não há dados.
         prestacao_data = {
             "servidor": prestacao.servidor.to_dict() if prestacao.servidor else {},
             "presidente": prestacao.presidente.to_dict() if prestacao.presidente else {},
@@ -51,11 +53,13 @@ def gerar_pdf(prestacao_id, tipo):
             "cargo": cargo.to_dict() if cargo else None
         }
         
-        # Gerar PDF
+        # Instancia o gerador de PDF.
         pdf_generator = PDFGenerator()
         
+        # Define o nome base do arquivo PDF.
         filename_base = prestacao.servidor.nome.replace(" ", "_") if prestacao.servidor else "desconhecido"
 
+        # Gera o PDF com base no tipo solicitado.
         if tipo == "diaria":
             pdf_buffer = pdf_generator.gerar_pdf_diaria(prestacao_data)
             filename = f"prestacao_contas_diaria_{filename_base}.pdf"
@@ -68,6 +72,7 @@ def gerar_pdf(prestacao_id, tipo):
         else:
             return jsonify({"error": "Tipo de PDF inválido"}), 400
         
+        # Retorna o PDF gerado como anexo.
         return send_file(
             pdf_buffer,
             as_attachment=True,
@@ -76,11 +81,13 @@ def gerar_pdf(prestacao_id, tipo):
         )
         
     except Exception as e:
+        # Em caso de erro, imprime o erro e retorna uma mensagem de erro ao cliente.
         print(f"Erro ao gerar PDF: {str(e)}")
         return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
 
 def calcular_totais_prestacao(prestacao_id, cargo, despesa_diaria, adiantamento_diaria):
-    # Se cargo ou despesa_diaria não existirem, retorna totais zerados
+    """Calcula os totais de diárias e refeições para uma prestação de contas."""
+    # Se o cargo ou as despesas de diária não existirem, retorna totais zerados.
     if not cargo or not despesa_diaria:
         return {
             "total_diarias": 0,
@@ -91,7 +98,7 @@ def calcular_totais_prestacao(prestacao_id, cargo, despesa_diaria, adiantamento_
             "detalhes": {}
         }
     
-    # Calcular totais
+    # Realiza o cálculo dos totais de diárias e refeições com base nos dados fornecidos.
     total_diarias_dentro = despesa_diaria.diarias_dentro_estado * cargo.valor_diaria_dentro_estado
     total_diarias_fora = despesa_diaria.diarias_fora_estado * cargo.valor_diaria_fora_estado
     
@@ -102,9 +109,12 @@ def calcular_totais_prestacao(prestacao_id, cargo, despesa_diaria, adiantamento_
     total_refeicoes = total_refeicoes_dentro + total_refeicoes_fora
     total_geral = total_diarias + total_refeicoes
     
+    # Obtém o valor do adiantamento de diária, se existir.
     valor_adiantamento_diaria = adiantamento_diaria.valor if adiantamento_diaria else 0
+    # Calcula a diferença entre o total geral e o adiantamento.
     diferenca = total_geral - valor_adiantamento_diaria
     
+    # Retorna um dicionário com os totais calculados e detalhes.
     return {
         "total_diarias": total_diarias,
         "total_refeicoes": total_refeicoes,

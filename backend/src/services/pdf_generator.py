@@ -8,11 +8,14 @@ from datetime import datetime
 import io
 
 class PDFGenerator:
+    """Classe responsável por gerar documentos PDF para prestação de contas."""
     def __init__(self):
+        """Inicializa o gerador de PDF e configura os estilos personalizados."""
         self.styles = getSampleStyleSheet()
         self.setup_custom_styles()
     
     def setup_custom_styles(self):
+        """Configura estilos de parágrafo personalizados para o documento PDF."""
         # Estilo para título principal
         self.styles.add(ParagraphStyle(
             name='TituloPrincipal',
@@ -54,40 +57,41 @@ class PDFGenerator:
         ))
 
     def gerar_pdf_diaria(self, prestacao_data):
+        """Gera um PDF de prestação de contas de diária."""
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=2*cm, leftMargin=2*cm, 
                               topMargin=2*cm, bottomMargin=2*cm)
         
         story = []
         
-        # Título
-        story.append(Paragraph("PRESTAÇÃO DE CONTAS DE DIÁRIA", self.styles['TituloPrincipal']))
+        # Adiciona o título principal do documento.
+        story.append(Paragraph("PRESTAÇÃO DE CONTAS DE DIÁRIA", self.styles["TituloPrincipal"]))
         story.append(Spacer(1, 20))
         
-        # Informações do servidor
+        # Seção de informações do servidor, detalhando o propósito da prestação de contas.
         servidor_info = f"""
-        O servidor <b>{prestacao_data['servidor']['nome']}</b> em atendimento às 
+        O servidor <b>{prestacao_data["servidor"]["nome"]}</b> em atendimento às 
         exigências legais, vem proceder a Prestação de Contas da DIÁRIA sob processo de Adiantamento Nº 
-        <b>{prestacao_data['adiantamento_diaria']['numero_adiantamento']}</b> recebidos em 
-        <b>{prestacao_data['adiantamento_diaria']['data_adiantamento']}</b>, conforme Empenho número 
-        <b>{prestacao_data['adiantamento_diaria']['numero_empenho']}</b>, para o que junta a 
+        <b>{prestacao_data["adiantamento_diaria"]["numero_adiantamento"]}</b> recebidos em 
+        <b>{prestacao_data["adiantamento_diaria"]["data_adiantamento"]}</b>, conforme Empenho número 
+        <b>{prestacao_data["adiantamento_diaria"]["numero_empenho"]}</b>, para o que junta a 
         documentação das despesas efetuadas, e recolhimento conforme discriminação abaixo:
         """
-        story.append(Paragraph(servidor_info, self.styles['TextoNormal']))
+        story.append(Paragraph(servidor_info, self.styles["TextoNormal"]))
         story.append(Spacer(1, 20))
         
-        # Tabela de diárias
+        # Tabela detalhando os valores das diárias e refeições.
         tabela_data = [
-            ['Tipo', 'Seleção Valor', '', 'R$', 'Valor'],
-            ['2', '1 Refeição', 'Diária Normal', 'R$', f"{prestacao_data['totais']['detalhes']['refeicoes_dentro_estado']['valor_unitario']:.2f}".replace('.', ',')],
-            ['0', '', 'Diária DF', 'R$', '-'],
-            ['0', '2 Refeições', 'Diária Normal', 'R$', '-'],
-            ['0', '', 'Diária DF', 'R$', '-'],
-            ['0', '3 Refeições', 'Diária Normal', 'R$', '-'],
-            ['0', '', 'Diária DF', 'R$', '-'],
-            ['3', 'Fora Sede c/pernoite', 'Diária Normal', 'R$', f"{prestacao_data['totais']['detalhes']['diarias_dentro_estado']['valor_unitario']:.2f}".replace('.', ',')],
-            ['0', '', 'Diária DF', 'R$', '-'],
-            ['', '', '', 'R$', f"{prestacao_data['totais']['total_geral']:.2f}".replace('.', ',')]
+            ["Tipo", "Seleção Valor", "", "R$", "Valor"],
+            ["2", "1 Refeição", "Diária Normal", "R$", f"{prestacao_data["totais"]["detalhes"]["refeicoes_dentro_estado"]["valor_unitario"]:.2f}".replace(".", ",")],
+            ["0", "", "Diária DF", "R$", "-"],
+            ["0", "2 Refeições", "Diária Normal", "R$", "-"],
+            ["0", "", "Diária DF", "R$", "-"],
+            ["0", "3 Refeições", "Diária Normal", "R$", "-"],
+            ["0", "", "Diária DF", "R$", "-"],
+            ["3", "Fora Sede c/pernoite", "Diária Normal", "R$", f"{prestacao_data["totais"]["detalhes"]["diarias_dentro_estado"]["valor_unitario"]:.2f}".replace(".", ",")],
+            ["0", "", "Diária DF", "R$", "-"],
+            ["", "", "", "R$", f"{prestacao_data["totais"]["total_geral"]:.2f}".replace(".", ",")]
         ]
         
         tabela = Table(tabela_data, colWidths=[1*cm, 4*cm, 3*cm, 1*cm, 2*cm])
@@ -105,8 +109,8 @@ class PDFGenerator:
         story.append(tabela)
         story.append(Spacer(1, 20))
         
-        # Tabela de documentos
-        story.append(Paragraph("DOCUMENTOS APRESENTADOS", self.styles['Subtitulo']))
+        # Tabela de documentos apresentados para comprovação.
+        story.append(Paragraph("DOCUMENTOS APRESENTADOS", self.styles["Subtitulo"]))
         story.append(Spacer(1, 10))
         
         doc_data = [['DATA', 'DESCRIÇÃO DOCUMENTO APRESENTADO', 'REFERÊNCIA']]
@@ -197,21 +201,22 @@ class PDFGenerator:
         return buffer
 
     def gerar_pdf_passagem(self, prestacao_data):
+        """Gera um PDF de prestação de contas de passagem."""
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=2*cm, leftMargin=2*cm, 
                               topMargin=2*cm, bottomMargin=2*cm)
         
         story = []
         
-        # Título
-        story.append(Paragraph("PRESTAÇÃO DE CONTAS DE ADIANTAMENTO", self.styles['TituloPrincipal']))
+        # Adiciona o título principal do documento.
+        story.append(Paragraph("PRESTAÇÃO DE CONTAS DE ADIANTAMENTO", self.styles["TituloPrincipal"]))
         story.append(Spacer(1, 20))
         
-        # Informações do servidor
-        adiantamento_passagem = prestacao_data.get('adiantamento_passagem')
+        # Seção de informações do servidor e detalhes do adiantamento de passagem.
+        adiantamento_passagem = prestacao_data.get("adiantamento_passagem")
         if not adiantamento_passagem:
             story.append(Paragraph("Não há adiantamento de passagem para esta prestação de contas.", 
-                                 self.styles['TextoNormal']))
+                                 self.styles["TextoNormal"]))
         else:
             servidor_info = f"""
             O servidor <b>{prestacao_data['servidor']['nome']}</b> em atendimento às exigências legais, vem proceder a Prestação de Contas do 
@@ -222,12 +227,12 @@ class PDFGenerator:
             story.append(Paragraph(servidor_info, self.styles['TextoNormal']))
             story.append(Spacer(1, 20))
             
-            # Tabela de passagens
+            # Tabela detalhando o adiantamento e as despesas de passagens.
             tabela_data = [
-                ['DATA', 'DESCRIÇÃO', 'DÉBITO/RECEBIDO', 'CRÉDITO/COMPROVADO/DEVOLVIDO'],
-                [adiantamento_passagem['data_adiantamento'], 
-                 f"Recebi conforme Empenho nº {adiantamento_passagem['numero_empenho']}", 
-                 f"R$ {adiantamento_passagem['valor']:.2f}".replace('.', ','), '']
+                ["DATA", "DESCRIÇÃO", "DÉBITO/RECEBIDO", "CRÉDITO/COMPROVADO/DEVOLVIDO"],
+                [adiantamento_passagem["data_adiantamento"], 
+                 f"Recebi conforme Empenho nº {adiantamento_passagem["numero_empenho"]}", 
+                 f"R$ {adiantamento_passagem["valor"]:.2f}".replace(".", ","), ""]
             ]
             
             # Adicionar passagens
@@ -283,42 +288,45 @@ class PDFGenerator:
         return buffer
 
     def gerar_pdf_parecer(self, prestacao_data):
+        """Gera um PDF de parecer técnico para prestação de contas."""
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=2*cm, leftMargin=2*cm, 
                               topMargin=2*cm, bottomMargin=2*cm)
         
         story = []
         
-        # Cabeçalho
-        story.append(Paragraph("PREFEITURA MUNICIPAL DE MUNICÍPIO EXEMPLO", self.styles['TituloPrincipal']))
+        # Adiciona o cabeçalho do documento com informações da prefeitura.
+        story.append(Paragraph("PREFEITURA MUNICIPAL DE MUNICÍPIO EXEMPLO", self.styles["TituloPrincipal"]))
         story.append(Paragraph("SECRETARIA MUNICIPAL DE ADMINISTRAÇÃO, PLANEJAMENTO E FINANÇAS", 
-                             self.styles['Subtitulo']))
+                             self.styles["Subtitulo"]))
         story.append(Spacer(1, 30))
         
-        story.append(Paragraph(f"A Contadoria, para o exame técnico em {datetime.now().strftime('%d/%m/%Y')}", 
-                             self.styles['TextoNormal']))
+        # Adiciona a data do exame técnico da Contadoria.
+        story.append(Paragraph(f"A Contadoria, para o exame técnico em {datetime.now().strftime("%d/%m/%Y")}", 
+                             self.styles["TextoNormal"]))
         story.append(Spacer(1, 50))
         
-        # Linha para secretário
-        story.append(Paragraph("_" * 60, self.styles['Assinatura']))
+        # Linha para assinatura do Secretário Municipal.
+        story.append(Paragraph("_" * 60, self.styles["Assinatura"]))
         story.append(Paragraph("Secretário Municipal de Administração,", self.styles['Assinatura']))
         story.append(Paragraph("Planejamento e Finanças", self.styles['Assinatura']))
         story.append(Spacer(1, 30))
         
-        # Parecer Técnico
+        # Título da seção de Parecer Técnico.
         story.append(Paragraph('"PARECER TÉCNICO"', self.styles['TituloPrincipal']))
         story.append(Spacer(1, 20))
         
-        adiantamento = prestacao_data.get('adiantamento_diaria', {})
+        # Obtém os dados do adiantamento de diária para preencher o parecer.
+        adiantamento = prestacao_data.get("adiantamento_diaria", {})
         parecer_texto = f"""
         A Contadoria, procedendo ao exame técnico de prestação de contas do(a) Sr.(a) 
-        <b>{prestacao_data['servidor']['nome']}</b>, relativo ao Adiantamento Nº 
-        <b>{adiantamento.get('numero_adiantamento', '')}</b> de 
-        <b>{adiantamento.get('data_adiantamento', '')}</b> no valor de R$ 
-        <b>{adiantamento.get('valor', 0):.2f}</b> encontrou a documentação em perfeita ordem quanto 
+        <b>{prestacao_data["servidor"]["nome"]}</b>, relativo ao Adiantamento Nº 
+        <b>{adiantamento.get("numero_adiantamento", "")}</b> de 
+        <b>{adiantamento.get("data_adiantamento", "")}</b> no valor de R$ 
+        <b>{adiantamento.get("valor", 0):.2f}</b> encontrou a documentação em perfeita ordem quanto 
         ao aspecto aritmético e legal das despesas efetuadas.
         """
-        story.append(Paragraph(parecer_texto, self.styles['TextoNormal']))
+        story.append(Paragraph(parecer_texto, self.styles["TextoNormal"]))
         story.append(Spacer(1, 30))
         
         story.append(Paragraph("À consideração Superior,", self.styles['TextoNormal']))
@@ -334,9 +342,9 @@ class PDFGenerator:
         story.append(Paragraph("Contadora", self.styles['Assinatura']))
         story.append(Spacer(1, 30))
         
-        # Termo de julgamento
+        # Termo de julgamento a ser preenchido pelo Presidente da Câmara.
         story.append(Paragraph(f"Ao Sr. Presidente da Câmara de Vereadores, para julgamento, Secretaria Municipal de", 
-                             self.styles['TextoNormal']))
+                             self.styles["TextoNormal"]))
         story.append(Paragraph(f"Administração, Planejamento e Finanças em {datetime.now().strftime('%d/%m/%Y')}", 
                              self.styles['TextoNormal']))
         story.append(Spacer(1, 30))
