@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/* Configuração básica para temas */
+:root {
+  /* Tema claro */
+  --bg-light: #ffffff;
+  --text-light: #1f2937;
+  --primary-light: #3b82f6;
+  --primary-text-light: #ffffff;
+  --card-light: #ffffff;
+  --border-light: #e5e7eb;
+  
+  /* Tema escuro */
+  --bg-dark: #111827;
+  --text-dark: #f9fafb;
+  --primary-dark: #60a5fa;
+  --primary-text-dark: #111827;
+  --card-dark: #1f2937;
+  --border-dark: #374151;
+}
+
+/* Aplicação dos temas */
+.light {
+  background-color: var(--bg-light);
+  color: var(--text-light);
+}
+
+.dark {
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+/* Transições suaves */
+* {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+/* Classes personalizadas para temas */
+.theme-bg {
+  @apply bg-white dark:bg-gray-900;
+}
+
+.theme-text {
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+.theme-card {
+  @apply bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700;
+}
+
+.theme-primary {
+  @apply bg-blue-600 dark:bg-blue-500 text-white;
+}
+
+.theme-secondary {
+  @apply bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100;
+}
+
+.theme-border {
+  @apply border-gray-200 dark:border-gray-700;
+}
+
+.theme-input {
+  @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100;
+}
