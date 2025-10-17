@@ -107,8 +107,7 @@ def create_adiantamento(prestacao_id):
         numero_adiantamento=data["numero_adiantamento"],
         numero_empenho=data["numero_empenho"],
         valor=data["valor"],
-       data_adiantamento=datetime.strptime(data["data_adiantamento"], 
-'%Y-%m-%d").date() if data.get("data_adiantamento") else None
+        data_adiantamento=datetime.strptime(data["data_adiantamento"], '%Y-%m-%d').date() if data.get("data_adiantamento") else None,
     )
     db.session.add(adiantamento)
     db.session.commit()
