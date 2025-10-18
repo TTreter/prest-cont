@@ -157,35 +157,54 @@ function TelaInicial({ setPrestacaoId }) {
   }
 
   const avancar = async () => {
+    console.log('Função avancar chamada')
+    console.log('Servidor selecionado:', servidorSelecionado)
+    console.log('Presidente selecionado:', presidenteSelecionado)
+    
     if (!servidorSelecionado || !presidenteSelecionado) {
+      console.log('Validação falhou: servidor ou presidente não selecionado')
       toast.error('Por favor, selecione um servidor e um presidente.')
       return
     }
 
     try {
+      console.log('Iniciando requisição para criar prestação de contas')
       setSubmitting(true)
+      
+      const requestBody = {
+        servidor_id: parseInt(servidorSelecionado),
+        presidente_id: parseInt(presidenteSelecionado)
+      }
+      console.log('Dados da requisição:', requestBody)
+      
       const response = await fetch('/api/prestacoes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          servidor_id: parseInt(servidorSelecionado),
-          presidente_id: parseInt(presidenteSelecionado)
-        })
+        body: JSON.stringify(requestBody)
       })
       
+      console.log('Resposta recebida:', response.status, response.statusText)
+      
       if (!response.ok) {
-        throw new Error('Erro ao criar prestação de contas')
+        const errorText = await response.text()
+        console.error('Erro na resposta:', errorText)
+        throw new Error(`Erro ao criar prestação de contas: ${response.status} - ${errorText}`)
       }
       
       const prestacao = await response.json()
+      console.log('Prestação criada:', prestacao)
+      
       setPrestacaoId(prestacao.id)
       toast.success('Prestação de contas iniciada!')
+      
+      console.log('Navegando para /adiantamentos')
       navigate('/adiantamentos')
     } catch (error) {
-      console.error('Erro ao criar prestação de contas:', error)
-      toast.error('Erro ao iniciar prestação de contas. Tente novamente.')
+      console.error('Erro completo ao criar prestação de contas:', error)
+      toast.error(`Erro ao iniciar prestação de contas: ${error.message}`)
     } finally {
       setSubmitting(false)
+      console.log('Finalizando função avancar')
     }
   }
 
