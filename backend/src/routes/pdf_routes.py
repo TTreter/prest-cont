@@ -4,6 +4,7 @@ from src.models.prestacao_contas import (
     PrestacaoContas, Adiantamento, DespesaDiaria, 
     DocumentoComprovacao, DespesaPassagem, Cargo, Servidor, Presidente
 )
+from flask_jwt_extended import jwt_required
 
 from src.services.pdf_generator import PDFGenerator
 from datetime import datetime
@@ -13,6 +14,7 @@ pdf_bp = Blueprint("pdf", __name__)
 
 # Rota para gerar PDFs de prestação de contas (diária, passagem ou parecer).
 @pdf_bp.route("/prestacoes/<int:prestacao_id>/pdf/<string:tipo>", methods=["GET"])
+@jwt_required()
 def gerar_pdf(prestacao_id, tipo):
     try:
         # Busca os dados da prestação de contas, incluindo informações do servidor e presidente.

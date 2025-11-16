@@ -4,6 +4,7 @@ from src.models.prestacao_contas import (
     Servidor, Cargo, Presidente, PrestacaoContas, 
     Adiantamento, DespesaDiaria, DocumentoComprovacao, DespesaPassagem
 )
+from flask_jwt_extended import jwt_required
 
 from datetime import datetime
 
@@ -12,12 +13,14 @@ prestacao_bp = Blueprint('prestacao', __name__)
 # Rotas para Servidores
 # Rota para obter todos os servidores cadastrados.
 @prestacao_bp.route("/servidores", methods=["GET"])
+@jwt_required()
 def get_servidores():
     servidores = Servidor.query.all()
     return jsonify([servidor.to_dict() for servidor in servidores])
 
 # Rota para criar um novo servidor.
 @prestacao_bp.route("/servidores", methods=["POST"])
+@jwt_required()
 def create_servidor():
     data = request.get_json()
     servidor = Servidor(
@@ -31,12 +34,14 @@ def create_servidor():
 # Rotas para Cargos
 # Rota para obter todos os cargos cadastrados.
 @prestacao_bp.route("/cargos", methods=["GET"])
+@jwt_required()
 def get_cargos():
     cargos = Cargo.query.all()
     return jsonify([cargo.to_dict() for cargo in cargos])
 
 # Rota para criar um novo cargo.
 @prestacao_bp.route("/cargos", methods=["POST"])
+@jwt_required()
 def create_cargo():
     data = request.get_json()
     cargo = Cargo(
@@ -50,6 +55,7 @@ def create_cargo():
 
 # Rota para atualizar um cargo existente.
 @prestacao_bp.route("/cargos/<int:cargo_id>", methods=["PUT"])
+@jwt_required()
 def update_cargo(cargo_id):
     cargo = Cargo.query.get_or_404(cargo_id)
     data = request.get_json()
@@ -64,12 +70,14 @@ def update_cargo(cargo_id):
 # Rotas para Presidentes
 # Rota para obter todos os presidentes cadastrados.
 @prestacao_bp.route("/presidentes", methods=["GET"])
+@jwt_required()
 def get_presidentes():
     presidentes = Presidente.query.all()
     return jsonify([presidente.to_dict() for presidente in presidentes])
 
 # Rota para criar um novo presidente.
 @prestacao_bp.route("/presidentes", methods=["POST"])
+@jwt_required()
 def create_presidente():
     data = request.get_json()
     presidente = Presidente(nome=data["nome"])
@@ -80,6 +88,7 @@ def create_presidente():
 # Rotas para Prestações de Contas
 # Rota para criar uma nova prestação de contas.
 @prestacao_bp.route("/prestacoes", methods=["POST"])
+@jwt_required()
 def create_prestacao():
     data = request.get_json()
     prestacao = PrestacaoContas(
@@ -92,6 +101,7 @@ def create_prestacao():
 
 # Rota para obter uma prestação de contas específica pelo ID.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>", methods=["GET"])
+@jwt_required()
 def get_prestacao(prestacao_id):
     prestacao = PrestacaoContas.query.get_or_404(prestacao_id)
     return jsonify(prestacao.to_dict())
@@ -99,6 +109,7 @@ def get_prestacao(prestacao_id):
 # Rotas para Adiantamentos
 # Rota para criar um novo adiantamento para uma prestação de contas específica.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>/adiantamentos", methods=["POST"])
+@jwt_required()
 def create_adiantamento(prestacao_id):
     data = request.get_json()
     adiantamento = Adiantamento(
@@ -115,6 +126,7 @@ def create_adiantamento(prestacao_id):
 
 # Rota para obter todos os adiantamentos de uma prestação de contas específica.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>/adiantamentos", methods=["GET"])
+@jwt_required()
 def get_adiantamentos(prestacao_id):
     adiantamentos = Adiantamento.query.filter_by(prestacao_id=prestacao_id).all()
     return jsonify([adiantamento.to_dict() for adiantamento in adiantamentos])
@@ -122,6 +134,7 @@ def get_adiantamentos(prestacao_id):
 # Rotas para Despesas de Diárias
 # Rota para criar uma nova despesa de diária para uma prestação de contas específica.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>/despesas-diarias", methods=["POST"])
+@jwt_required()
 def create_despesa_diaria(prestacao_id):
     data = request.get_json()
     despesa = DespesaDiaria(
@@ -137,6 +150,7 @@ def create_despesa_diaria(prestacao_id):
 
 # Rota para obter as despesas de diária de uma prestação de contas específica.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>/despesas-diarias", methods=["GET"])
+@jwt_required()
 def get_despesa_diaria(prestacao_id):
     despesa = DespesaDiaria.query.filter_by(prestacao_id=prestacao_id).first()
     if despesa:
@@ -145,6 +159,7 @@ def get_despesa_diaria(prestacao_id):
 
 # Rota para atualizar as despesas de diária de uma prestação de contas específica.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>/despesas-diarias", methods=["PUT"])
+@jwt_required()
 def update_despesa_diaria(prestacao_id):
     data = request.get_json()
     despesa = DespesaDiaria.query.filter_by(prestacao_id=prestacao_id).first()
@@ -165,6 +180,7 @@ def update_despesa_diaria(prestacao_id):
 # Rotas para Documentos de Comprovação
 # Rota para criar um novo documento de comprovação para uma prestação de contas específica.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>/documentos", methods=["POST"])
+@jwt_required()
 def create_documento(prestacao_id):
     data = request.get_json()
     documento = DocumentoComprovacao(
@@ -181,12 +197,14 @@ def create_documento(prestacao_id):
 
 # Rota para obter todos os documentos de comprovação de uma prestação de contas específica.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>/documentos", methods=["GET"])
+@jwt_required()
 def get_documentos(prestacao_id):
     documentos = DocumentoComprovacao.query.filter_by(prestacao_id=prestacao_id).all()
     return jsonify([documento.to_dict() for documento in documentos])
 
 # Rota para deletar um documento de comprovação específico pelo ID.
 @prestacao_bp.route("/documentos/<int:documento_id>", methods=["DELETE"])
+@jwt_required()
 def delete_documento(documento_id):
     documento = DocumentoComprovacao.query.get_or_404(documento_id)
     db.session.delete(documento)
@@ -197,6 +215,7 @@ def delete_documento(documento_id):
 # Rotas para Despesas de Passagens
 # Rota para criar uma nova despesa de passagem para uma prestação de contas específica.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>/despesas-passagens", methods=["POST"])
+@jwt_required()
 def create_despesa_passagem(prestacao_id):
     data = request.get_json()
     despesa = DespesaPassagem(
@@ -211,12 +230,14 @@ def create_despesa_passagem(prestacao_id):
 
 # Rota para obter todas as despesas de passagem de uma prestação de contas específica.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>/despesas-passagens", methods=["GET"])
+@jwt_required()
 def get_despesas_passagens(prestacao_id):
     despesas = DespesaPassagem.query.filter_by(prestacao_id=prestacao_id).all()
     return jsonify([despesa.to_dict() for despesa in despesas])
 
 # Rota para deletar uma despesa de passagem específica pelo ID.
 @prestacao_bp.route("/despesas-passagens/<int:despesa_id>", methods=["DELETE"])
+@jwt_required()
 def delete_despesa_passagem(despesa_id):
     despesa = DespesaPassagem.query.get_or_404(despesa_id)
     db.session.delete(despesa)
@@ -226,6 +247,7 @@ def delete_despesa_passagem(despesa_id):
 # Rota para calcular totais
 # Rota para calcular os totais de diárias e refeições para uma prestação de contas específica.
 @prestacao_bp.route("/prestacoes/<int:prestacao_id>/calcular-totais", methods=["GET"])
+@jwt_required()
 def calcular_totais(prestacao_id):
     prestacao = PrestacaoContas.query.get_or_404(prestacao_id)
     servidor = prestacao.servidor
