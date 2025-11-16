@@ -1,13 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { useState, useEffect, lazy, Suspense } from 'react'
 
-// Importa os componentes de tela da aplicação.
-import TelaInicial from './components/TelaInicial'
-import TelaConfiguracaoDiarias from './components/TelaConfiguracaoDiarias'
-import TelaAdiantamentos from './components/TelaAdiantamentos'
-import TelaDocumentos from './components/TelaDocumentos'
-import TelaPassagens from './components/TelaPassagens'
-import TelaFinal from './components/TelaFinal'
+// Lazy loading dos componentes de tela para otimizar o bundle
+const TelaInicial = lazy(() => import('./components/TelaInicial'))
+const TelaConfiguracaoDiarias = lazy(() => import('./components/TelaConfiguracaoDiarias'))
+const TelaAdiantamentos = lazy(() => import('./components/TelaAdiantamentos'))
+const TelaDocumentos = lazy(() => import('./components/TelaDocumentos'))
+const TelaPassagens = lazy(() => import('./components/TelaPassagens'))
+const TelaFinal = lazy(() => import('./components/TelaFinal'))
+const Login = lazy(() => import('./components/Login'))
 
 // Importa os componentes de tema e notificações.
 import { ThemeProvider } from './components/theme-provider'
@@ -15,9 +16,11 @@ import { ThemeToggle } from './components/theme-toggle'
 import { ToastProvider } from './components/ui/toast'
 import { NavigationBreadcrumb } from './components/navigation-breadcrumb'
 import { ProgressIndicator, CompactProgressIndicator } from './components/progress-indicator'
+import { Button } from './components/ui/button'
 
-// Importa hooks para responsividade.
+// Importa hooks e serviços.
 import { useResponsive } from './hooks/use-responsive'
+import authService from './services/authService'
 
 import './App.css'
 
@@ -27,9 +30,79 @@ import './App.css'
 function AppContent() {
   // Estado para armazenar o ID da prestação de contas, passado entre as telas.
   const [prestacaoId, setPrestacaoId] = useState(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
   
   // Hook para detectar responsividade
   const { isMobile } = useResponsive()
+
+  // Verificar autenticação ao montar o componente
+  useEffect(() => {
+    const checkAuth = () => {
+      const authenticated = authService.isAuthenticated()
+      setIsAuthenticated(authenticated)
+      if (authenticated) {
+        const userData = authService.getUser()
+        setUser(userData)
+      }
+      setLoading(false)
+    }
+    checkAuth()
+  }, [])
+
+  // Função para lidar com login bem-sucedido
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true)
+    const userData = authService.getUser()
+    setUser(userData)
+  }
+
+  // Função para lidar com logout
+  const handleLogout = () => {
+    authService.logout()
+    setIsAuthenticated(false)
+    setUser(null)
+    setPrestacaoId(null)
+  }
+
+  // Mostrar loading enquanto verifica autenticação
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Se não estiver autenticado, mostrar tela de login
+  if (!isAuthenticated) {
+    return (
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Carregando...</p>
+          </div>
+        </div>
+      }>
+        <Login onLoginSuccess={handleLoginSuccess} />
+      </Suspense>
+    )
+  }
+
+  // Componente de loading para Suspense
+  const LoadingFallback = () => (
+    <div className="flex items-center justify-center py-12">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-3 text-gray-600 dark:text-gray-400 text-sm">Carregando...</p>
+      </div>
+    </div>
+  )
 
   return (
     // Configura o roteamento da aplicação usando React Router.
@@ -47,9 +120,23 @@ function AppContent() {
                   Sistema de Prestação de Contas de Diárias
                 </p>
               </div>
-              {/* Botão para alternar tema */}
-              <div className="flex justify-end">
+              {/* Informações do usuário e controles */}
+              <div className="flex items-center gap-3">
+                {user && (
+                  <div className="text-right mr-3">
+                    <p className="text-sm font-medium">{user.username}</p>
+                    <p className="text-xs text-blue-100">{user.email}</p>
+                  </div>
+                )}
                 <ThemeToggle />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="bg-white/10 hover:bg-white/20 text-white border-white/30"
+                >
+                  Sair
+                </Button>
               </div>
             </div>
           </div>
@@ -74,38 +161,45 @@ function AppContent() {
         
         {/* Conteúdo principal da aplicação, onde as rotas são renderizadas. */}
         <main className="container mx-auto px-4 py-6">
-          <Routes>
-            {/* Rota para a tela inicial. */}
-            <Route 
-              path="/" 
-              element={<TelaInicial setPrestacaoId={setPrestacaoId} />} 
-            />
-            {/* Rota para a tela de configuração de diárias. */}
-            <Route 
-              path="/configuracao-diarias" 
-              element={<TelaConfiguracaoDiarias />} 
-            />
-            {/* Rota para a tela de adiantamentos, passando o ID da prestação. */}
-            <Route 
-              path="/adiantamentos" 
-              element={<TelaAdiantamentos prestacaoId={prestacaoId} />} 
-            />
-            {/* Rota para a tela de documentos, passando o ID da prestação. */}
-            <Route 
-              path="/documentos" 
-              element={<TelaDocumentos prestacaoId={prestacaoId} />} 
-            />
-            {/* Rota para a tela de passagens, passando o ID da prestação. */}
-            <Route 
-              path="/passagens" 
-              element={<TelaPassagens prestacaoId={prestacaoId} />} 
-            />
-            {/* Rota para a tela final, passando o ID da prestação. */}
-            <Route 
-              path="/final" 
-              element={<TelaFinal prestacaoId={prestacaoId} />} 
-            />
-          </Routes>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              {/* Rota para a tela inicial. */}
+              <Route 
+                path="/" 
+                element={isAuthenticated ? <TelaInicial setPrestacaoId={setPrestacaoId} /> : <Navigate to="/login" />} 
+              />
+              {/* Rota para a tela de configuração de diárias. */}
+              <Route 
+                path="/configuracao-diarias" 
+                element={isAuthenticated ? <TelaConfiguracaoDiarias /> : <Navigate to="/login" />} 
+              />
+              {/* Rota para a tela de adiantamentos, passando o ID da prestação. */}
+              <Route 
+                path="/adiantamentos" 
+                element={isAuthenticated ? <TelaAdiantamentos prestacaoId={prestacaoId} /> : <Navigate to="/login" />} 
+              />
+              {/* Rota para a tela de documentos, passando o ID da prestação. */}
+              <Route 
+                path="/documentos" 
+                element={isAuthenticated ? <TelaDocumentos prestacaoId={prestacaoId} /> : <Navigate to="/login" />} 
+              />
+              {/* Rota para a tela de passagens, passando o ID da prestação. */}
+              <Route 
+                path="/passagens" 
+                element={isAuthenticated ? <TelaPassagens prestacaoId={prestacaoId} /> : <Navigate to="/login" />} 
+              />
+              {/* Rota para a tela final, passando o ID da prestação. */}
+              <Route 
+                path="/final" 
+                element={isAuthenticated ? <TelaFinal prestacaoId={prestacaoId} /> : <Navigate to="/login" />} 
+              />
+              {/* Rota de login */}
+              <Route 
+                path="/login" 
+                element={!isAuthenticated ? <Login onLoginSuccess={handleLoginSuccess} /> : <Navigate to="/" />} 
+              />
+            </Routes>
+          </Suspense>
         </main>
 
         {/* Rodapé da aplicação */}

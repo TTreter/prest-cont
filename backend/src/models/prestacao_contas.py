@@ -8,9 +8,9 @@ class Servidor(db.Model):
     # Identificador único do servidor.
     id = db.Column(db.Integer, primary_key=True)
     # Nome completo do servidor.
-    nome = db.Column(db.String(200), nullable=False)
+    nome = db.Column(db.String(200), nullable=False, index=True)
     # Cargo ocupado pelo servidor.
-    cargo = db.Column(db.String(100), nullable=False)
+    cargo = db.Column(db.String(100), nullable=False, index=True)
     
     # Converte o objeto Servidor em um dicionário.
     def to_dict(self):
@@ -65,11 +65,11 @@ class PrestacaoContas(db.Model):
     # Identificador único da prestação de contas.
     id = db.Column(db.Integer, primary_key=True)
     # ID do servidor associado à prestação de contas.
-    servidor_id = db.Column(db.Integer, db.ForeignKey('servidores.id'), nullable=False)
+    servidor_id = db.Column(db.Integer, db.ForeignKey('servidores.id'), nullable=False, index=True)
     # ID do presidente associado à prestação de contas.
-    presidente_id = db.Column(db.Integer, db.ForeignKey('presidentes.id'), nullable=False)
+    presidente_id = db.Column(db.Integer, db.ForeignKey('presidentes.id'), nullable=False, index=True)
     # Data de criação da prestação de contas.
-    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+    data_criacao = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     
     # Relacionamento com o modelo Servidor.
     servidor = db.relationship('Servidor', backref='prestacoes')
@@ -94,9 +94,9 @@ class Adiantamento(db.Model):
     # Identificador único do adiantamento.
     id = db.Column(db.Integer, primary_key=True)
     # ID da prestação de contas à qual este adiantamento pertence.
-    prestacao_id = db.Column(db.Integer, db.ForeignKey('prestacoes_contas.id'), nullable=False)
+    prestacao_id = db.Column(db.Integer, db.ForeignKey('prestacoes_contas.id'), nullable=False, index=True)
     # Tipo de adiantamento: 'diaria' ou 'passagem'.
-    tipo = db.Column(db.String(20), nullable=False)  # 'diaria' ou 'passagem'
+    tipo = db.Column(db.String(20), nullable=False, index=True)  # 'diaria' ou 'passagem'
     # Número do adiantamento.
     numero_adiantamento = db.Column(db.String(50), nullable=False)
     # Número do empenho associado ao adiantamento.
@@ -128,7 +128,7 @@ class DespesaDiaria(db.Model):
     # Identificador único da despesa de diária.
     id = db.Column(db.Integer, primary_key=True)
     # ID da prestação de contas à qual esta despesa pertence.
-    prestacao_id = db.Column(db.Integer, db.ForeignKey('prestacoes_contas.id'), nullable=False)
+    prestacao_id = db.Column(db.Integer, db.ForeignKey('prestacoes_contas.id'), nullable=False, index=True)
     # Número de diárias dentro do estado.
     diarias_dentro_estado = db.Column(db.Integer, default=0)
     # Número de refeições dentro do estado.
@@ -159,9 +159,9 @@ class DocumentoComprovacao(db.Model):
     # Identificador único do documento.
     id = db.Column(db.Integer, primary_key=True)
     # ID da prestação de contas à qual este documento pertence.
-    prestacao_id = db.Column(db.Integer, db.ForeignKey('prestacoes_contas.id'), nullable=False)
+    prestacao_id = db.Column(db.Integer, db.ForeignKey('prestacoes_contas.id'), nullable=False, index=True)
     # Tipo do documento (ex: 'nota_fiscal', 'nota_hotel').
-    tipo_documento = db.Column(db.String(50), nullable=False)  # 'nota_fiscal', 'nota_hotel', etc.
+    tipo_documento = db.Column(db.String(50), nullable=False, index=True)  # 'nota_fiscal', 'nota_hotel', etc.
     # Descrição detalhada do documento.
     descricao = db.Column(db.Text, nullable=False)
     # Data do documento.
@@ -190,7 +190,7 @@ class DespesaPassagem(db.Model):
     # Identificador único da despesa de passagem.
     id = db.Column(db.Integer, primary_key=True)
     # ID da prestação de contas à qual esta despesa pertence.
-    prestacao_id = db.Column(db.Integer, db.ForeignKey('prestacoes_contas.id'), nullable=False)
+    prestacao_id = db.Column(db.Integer, db.ForeignKey('prestacoes_contas.id'), nullable=False, index=True)
     # Bilhete de Passagem Eletrônico (BPE).
     bpe = db.Column(db.String(50), nullable=False)
     # Valor da passagem.
