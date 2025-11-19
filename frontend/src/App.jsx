@@ -109,23 +109,23 @@ function AppContent() {
     <Router>
       <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
         {/* Cabeçalho da aplicação com suporte a temas e responsividade */}
-        <header className="bg-blue-600 dark:bg-blue-700 text-white shadow-lg">
-          <div className="container mx-auto px-4 py-4">
+        <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 dark:from-blue-800 dark:via-blue-900 dark:to-indigo-900 text-white shadow-xl">
+          <div className="container mx-auto px-4 py-5">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div className="flex-1">
-                <h1 className={`font-bold ${isMobile ? 'text-xl' : 'text-2xl'}`}>
+                <h1 className={`font-bold tracking-tight ${isMobile ? 'text-xl' : 'text-2xl'}`}>
                   Câmara Municipal de Município Exemplo
                 </h1>
-                <p className={`text-blue-100 ${isMobile ? 'text-sm' : 'text-base'}`}>
+                <p className={`text-blue-50 font-medium ${isMobile ? 'text-sm' : 'text-base'}`}>
                   Sistema de Prestação de Contas de Diárias
                 </p>
               </div>
               {/* Informações do usuário e controles */}
               <div className="flex items-center gap-3">
                 {user && (
-                  <div className="text-right mr-3">
-                    <p className="text-sm font-medium">{user.username}</p>
-                    <p className="text-xs text-blue-100">{user.email}</p>
+                  <div className="text-right mr-3 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
+                    <p className="text-sm font-semibold">{user.username}</p>
+                    <p className="text-xs text-blue-50">{user.email}</p>
                   </div>
                 )}
                 <ThemeToggle />
@@ -133,7 +133,7 @@ function AppContent() {
                   variant="outline"
                   size="sm"
                   onClick={handleLogout}
-                  className="bg-white/10 hover:bg-white/20 text-white border-white/30"
+                  className="bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm font-medium transition-all duration-300 hover:scale-105"
                 >
                   Sair
                 </Button>
@@ -143,8 +143,8 @@ function AppContent() {
         </header>
 
         {/* Área de navegação e progresso */}
-        <div className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
-          <div className="container mx-auto px-4 py-3">
+        <div className="bg-gradient-to-b from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="container mx-auto px-4 py-4">
             {/* Breadcrumb para desktop */}
             {!isMobile && (
               <NavigationBreadcrumb className="mb-4" />
@@ -203,11 +203,11 @@ function AppContent() {
         </main>
 
         {/* Rodapé da aplicação */}
-        <footer className="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
+        <footer className="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 border-t border-gray-200 dark:border-gray-700 mt-auto">
           <div className="container mx-auto px-4 py-6">
             <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-              <p>© 2024 Câmara Municipal de Município Exemplo</p>
-              <p className="mt-1">Sistema de Prestação de Contas de Diárias</p>
+              <p className="font-semibold">© 2024 Câmara Municipal de Município Exemplo</p>
+              <p className="mt-1 text-xs">Sistema de Prestação de Contas de Diárias</p>
             </div>
           </div>
         </footer>

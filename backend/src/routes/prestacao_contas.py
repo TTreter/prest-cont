@@ -188,7 +188,7 @@ def create_documento(prestacao_id):
         tipo_documento=data["tipo_documento"],
         descricao=data["descricao"],
         data_documento=datetime.strptime(data["data_documento"], 
-'%Y-%m-%d").date() if data.get("data_documento") else None,
+            '%Y-%m-%d').date() if data.get("data_documento") else None,
         valor=data.get("valor")
     )
     db.session.add(documento)
